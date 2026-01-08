@@ -1,5 +1,3 @@
-import java.util.Scanner
-
 interface Identifiable {
     val id: Int
 }
@@ -17,18 +15,17 @@ data class Student(
 ) : Identifiable
 
 fun main() {
-    val scanner = Scanner(System.`in`)
     val students = mutableListOf<Student>()
     var nextId = 1
 
     while (true) {
         printMenu()
-        when (scanner.nextLine().trim()) {
-            "1" -> nextId = addStudent(scanner, students, nextId)
+        when (readln().trim()) {
+            "1" -> nextId = addStudent(students, nextId)
             "2" -> listStudents(students)
-            "3" -> findStudents(scanner, students)
-            "4" -> editStudent(scanner, students)
-            "5" -> deleteStudent(scanner, students)
+            "3" -> findStudents(students)
+            "4" -> editStudent(students)
+            "5" -> deleteStudent(students)
             "6" -> showStatistics(students)
             "7" -> return
             else -> println("Invalid option")
@@ -51,23 +48,25 @@ fun printMenu() {
     )
 }
 
-
 fun addStudent(
-    scanner: Scanner,
     students: MutableList<Student>,
     nextId: Int
 ): Int {
     print("Enter name: ")
-    val name = scanner.nextLine().trim()
+    val name = readln().trim()
 
     print("Enter age: ")
-    val age = scanner.nextLine().toIntOrNull() ?: return nextId.also {
+    val ageInput = readln().trim()
+    val age = ageInput.toIntOrNull()
+
+    if (age == null || age <= 0) {
         println("Invalid age")
+        return nextId
     }
 
     val courses = mutableListOf<Course>()
     print("Add course name (or empty to skip): ")
-    val courseName = scanner.nextLine().trim()
+    val courseName = readln().trim()
     if (courseName.isNotEmpty()) {
         courses.add(Course(courseName, 3))
     }
@@ -88,9 +87,9 @@ fun listStudents(students: List<Student>) {
     }
 }
 
-fun findStudents(scanner: Scanner, students: List<Student>) {
+fun findStudents(students: List<Student>) {
     print("Search name: ")
-    val query = scanner.nextLine().trim().lowercase()
+    val query = readln().trim().lowercase()
 
     val results = students.filter {
         it.name.lowercase().contains(query)
@@ -103,24 +102,23 @@ fun findStudents(scanner: Scanner, students: List<Student>) {
     }
 }
 
-fun editStudent(scanner: Scanner, students: MutableList<Student>) {
+fun editStudent(students: MutableList<Student>) {
     print("Enter student ID: ")
-    val id = scanner.nextLine().toIntOrNull() ?: return
+    val id = readln().toIntOrNull() ?: return
 
     val student = students.find { it.id == id }
     student?.let {
-        print("New name: ")
-        it.name = scanner.nextLine().trim()
+        print("New course: ")
+        it.name = readln().trim()
         print("New age: ")
-        it.age = scanner.nextLine().toIntOrNull() ?: it.age
+        it.age = readln().toIntOrNull() ?: it.age
         println("Updated")
     } ?: println("Student not found")
 }
 
-
-fun deleteStudent(scanner: Scanner, students: MutableList<Student>) {
+fun deleteStudent(students: MutableList<Student>) {
     print("Enter student ID to delete: ")
-    val id = scanner.nextLine().toIntOrNull() ?: return
+    val id = readln().toIntOrNull() ?: return
 
     val removed = students.removeIf { it.id == id }
     println(if (removed) "Student deleted" else "Student not found")
